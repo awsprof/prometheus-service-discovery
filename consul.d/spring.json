@@ -1,0 +1,19 @@
+{
+    "service": {
+        "name": "spring-app",
+        "address": "192.168.10.163",
+        "port": 49096,
+        "tags": [
+            "spring",
+            "metrics_path=/actuator/prometheus"
+        ],
+        "checks": [
+            {
+                "id": "metrics",
+                "name": "Spring Metrics",
+                "http": "http://192.168.10.163:49096/actuator/prometheus",
+                "interval": "10s"
+            }
+        ]
+    }
+}

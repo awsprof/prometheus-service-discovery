@@ -1,0 +1,18 @@
+{
+    "service": {
+        "name": "cadvisor",
+        "address": "cadvisor",
+        "port": 8080,
+        "tags": [
+            "monitoring"
+        ],
+        "checks": [
+            {
+                "id": "metrics",
+                "name": "CAdvisor Metrics",
+                "http": "http://cadvisor:8080/metrics",
+                "interval": "10s"
+            }
+        ]
+    }
+}

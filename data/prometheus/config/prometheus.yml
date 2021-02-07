@@ -1,0 +1,101 @@
+# my global config
+global:
+  scrape_interval:     5s # By default, scrape targets every 15 seconds.
+  evaluation_interval: 5s # By default, scrape targets every 15 seconds.
+  # scrape_timeout is set to the global default (10s).
+
+  # Attach these labels to any time series or alerts when communicating with
+  # external systems (federation, remote storage, Alertmanager).
+  external_labels:
+    monitor: 'my-project'
+
+# Load and evaluate rules in this file every 'evaluation_interval' seconds.
+rule_files:
+  # - "alert.rules"
+  # - "first.rules"
+  # - "second.rules"
+  - "/etc/prometheus/alert.rules"
+
+alerting:
+  alertmanagers:
+    - timeout: 10s
+      api_version: v1
+      path_prefix: /
+      consul_sd_configs:
+      - server: 'dev-consul-server:8500'
+      relabel_configs:
+        - source_labels: [__meta_consul_tags]
+          regex: .*,alerts,.*
+          action: keep
+        - source_labels: [__meta_consul_service]
+          target_label: job
+        - source_labels: ['__meta_consul_service_address', '__meta_consul_service_port']
+          separator: ':'
+          regex: '(.*)'
+          target_label: '__address__'
+          replacement: '$1'
+          action: replace
+
+# A scrape configuration containing exactly one endpoint to scrape:
+# Here it's Prometheus itself.
+scrape_configs:
+  - job_name: dockerscanners
+    consul_sd_configs:
+      - server: 'dev-consul-server:8500'
+    relabel_configs:
+      - source_labels: [__meta_consul_tags]
+        regex: .*,monitoring,.*
+        action: keep
+      - source_labels: [__meta_consul_service]
+        target_label: job
+      - source_labels: ['__meta_consul_service_address', '__meta_consul_service_port']
+        separator: ':'
+        regex: '(.*)'
+        target_label: '__address__'
+        replacement: '$1'
+        action: replace
+  - job_name: springscanners
+    consul_sd_configs:
+      - server: 'dev-consul-server:8500'
+    relabel_configs:
+      - source_labels: [__meta_consul_tags]
+        regex: .*,spring,.*
+        action: keep
+      - source_labels: [__meta_consul_service]
+        target_label: job
+      - source_labels: ['__meta_consul_service_address', '__meta_consul_service_port']
+        separator: ':'
+        regex: '(.*)'
+        target_label: '__address__'
+        replacement: '$1'
+        action: replace
+      - source_labels: [__metrics_path__]
+        separator: ;
+        regex: /metrics
+        target_label: __metrics_path__
+        replacement: /actuator/prometheus
+        action: replace
+
+  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
+  - job_name: 'prometheus'
+
+    # Override the global default and scrape targets from this job every 5 seconds.
+    scrape_interval: 5s
+
+    # metrics_path defaults to '/metrics'
+    # scheme defaults to 'http'.
+
+    static_configs:
+      - targets: ['localhost:9090']
+#  - job_name: 'spring'
+#    metrics_path: '/actuator/prometheus'
+#    static_configs:
+#      - targets: ['BigCintiq2020:49096']
+  #- job_name: 'alerting'
+    #scrape_interval: 5s
+    #static_configs:
+    #  - targets: [alert-manager:9093]
+
+
+
+    
