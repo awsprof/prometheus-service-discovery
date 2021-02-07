@@ -8,8 +8,8 @@ route:
 receivers:
 - name: awsbuilds
   slack_configs:
-  - api_url: https://hooks.slack.com/services/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  ##webhook url
-    channel: '#awsbuilds'
+  - api_url: <<API_URL>>  ##webhook url
+    channel: '#<<CHANNEL>>'
     icon_url: https://avatars3.githubusercontent.com/u/3380462
     send_resolved: true
     text: "\nsummary: {{ .CommonAnnotations.summary }}\ndescription: {{ .CommonAnnotations.description }}"
